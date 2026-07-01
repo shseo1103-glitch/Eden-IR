@@ -1,0 +1,6 @@
+{
+  "name": "Eden-IR 통합 관리 플랫폼",
+  "description": "이든 IR (Eden Investment Relations Platform) - 기획, 진행, 평가 및 AI 피드백을 지원하는 통합 IR SaaS 플랫폼 대시보드",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
