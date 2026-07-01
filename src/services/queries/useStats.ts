@@ -6,6 +6,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Event, JudgeProfile, Evaluation, AIFeedback, UserType } from '../../types';
 import { useUiStore } from '../../store/useUiStore';
+import { useAuthStore } from '../../store/useAuthStore';
 
 // Define a realistic in-memory database to simulate server-side persistence
 const initialEvents: Event[] = [
@@ -194,7 +195,7 @@ const initialUsers: any[] = [
     user_id: 'user-superadmin',
     email: 'superadmin@irplus.co.kr',
     user_type: UserType.SUPER_ADMIN,
-    name: '박하나',
+    name: '박하나로동글',
     phone: '010-3333-7777',
     status: 'ACTIVE',
     created_at: '2026-01-15T09:00:00Z',
@@ -1052,6 +1053,19 @@ export function useUpdateUserMutation() {
               }
             });
           }
+        }
+
+        // 4. Update currently logged-in user's active session in useAuthStore for immediate UI propagation
+        const currentSessionUser = useAuthStore.getState().currentUser;
+        if (currentSessionUser && (currentSessionUser.user_id === merged.user_id || currentSessionUser.user_type === merged.user_type)) {
+          useAuthStore.setState({
+            currentUser: {
+              ...currentSessionUser,
+              name: merged.name,
+              email: merged.email,
+              phone: merged.phone
+            }
+          });
         }
 
         return db.users[idx];

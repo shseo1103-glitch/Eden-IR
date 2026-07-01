@@ -21,59 +21,65 @@ export const useAuthStore = create<AuthStore>((set) => ({
   currentRole: UserType.SUPER_ADMIN,
   isAuthenticated: false,
   setCurrentRole: (role) => set((state) => {
+    // Try to find the matching user in persistent db first to maintain data integrity
+    let dbUser: any = null;
+    if (typeof window !== 'undefined' && (window as any).__eden_ir_db?.users) {
+      dbUser = (window as any).__eden_ir_db.users.find((u: any) => u.user_type === role);
+    }
+
     // Generate role details
     let roleName = '';
-    let email = '';
-    let name = '';
-    let client_id = undefined;
-    let startup_id = undefined;
-    let judge_id = undefined;
+    let email = dbUser?.email || '';
+    let name = dbUser?.name || '';
+    let client_id = dbUser?.client_id || undefined;
+    let startup_id = dbUser?.startup_id || undefined;
+    let judge_id = dbUser?.judge_id || undefined;
 
     switch (role) {
       case UserType.SUPER_ADMIN:
         roleName = '최고 관리자 (SUPER_ADMIN)';
-        email = 'superadmin@irplus.co.kr';
-        name = '박하나';
+        if (!email) email = 'superadmin@irplus.co.kr';
+        if (!name) name = '박하나로동글';
         break;
       case UserType.ADMIN:
         roleName = '관리자 (ADMIN)';
-        email = 'admin@irplus.co.kr';
-        name = '이관리';
+        if (!email) email = 'admin@irplus.co.kr';
+        if (!name) name = '이관리';
         break;
       case UserType.CLIENT:
         roleName = '발주처 기관 담당자 (CLIENT)';
-        email = 'client@agency.go.kr';
-        name = '김도진';
-        client_id = 'client-1';
+        if (!email) email = 'client@agency.go.kr';
+        if (!name) name = '김도진';
+        if (!client_id) client_id = 'client-1';
         break;
       case UserType.STARTUP:
         roleName = '발표기업 대표 (STARTUP)';
-        email = 'startup@edenbiotech.io';
-        name = '홍길동';
-        startup_id = 'startup-1';
+        if (!email) email = 'startup@edenbiotech.io';
+        if (!name) name = '홍길동';
+        if (!startup_id) startup_id = 'startup-1';
         break;
       case UserType.JUDGE:
         roleName = '심사위원 (JUDGE)';
-        email = 'judge1@abc.com';
-        name = '이투자';
-        judge_id = 'judge-1';
+        if (!email) email = 'judge1@abc.com';
+        if (!name) name = '이투자';
+        if (!judge_id) judge_id = 'judge-1';
         break;
       case UserType.PARTNER:
         roleName = '협력 파트너사 (PARTNER)';
-        email = 'partner@soundtech.co.kr';
-        name = '박지훈';
+        if (!email) email = 'partner@soundtech.co.kr';
+        if (!name) name = '박지훈';
         break;
     }
 
     const updatedUser: User = {
-      user_id: `${role.toLowerCase()}-uuid-999`,
+      user_id: dbUser?.user_id || `${role.toLowerCase()}-uuid-999`,
       email,
       user_type: role,
       name,
-      phone: '010-9999-8888',
+      phone: dbUser?.phone || '010-9999-8888',
       region_code: role === UserType.CLIENT ? 'SEOUL' : undefined,
-      status: 'ACTIVE',
-      created_at: '2026-03-20T10:00:00Z',
+      status: dbUser?.status || 'ACTIVE',
+      created_at: dbUser?.created_at || '2026-03-20T10:00:00Z',
       last_login_at: new Date().toISOString(),
       client_id,
       startup_id,
@@ -121,7 +127,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       startup_id = matchedUser.startup_id;
     } else {
       if (email === 'superadmin@irplus.co.kr') {
-        name = '박하나';
+        name = '박하나로동글';
       } else if (email === 'admin@irplus.co.kr') {
         name = '이관리';
       } else if (email === 'client@agency.go.kr') {
