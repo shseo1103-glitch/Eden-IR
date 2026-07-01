@@ -43,6 +43,25 @@ export default function AdminLayout({
   const { isDarkMode, isSidebarOpen, toggleDarkMode, toggleSidebar } = useUiStore();
   const { currentRole, currentUser, setCurrentRole, logout } = useAuthStore();
 
+  const [currentTime, setCurrentTime] = React.useState<Date>(new Date());
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatDateTime = (date: Date) => {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+    const ss = String(date.getSeconds()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+  };
+
   const menuItems = [
     { id: 'dashboard', name: '종합 대시보드', icon: LayoutDashboard, roles: [UserType.SUPER_ADMIN, UserType.ADMIN] },
     { id: 'events', name: '행사 모니터링', icon: CalendarRange, roles: [UserType.SUPER_ADMIN, UserType.ADMIN, UserType.CLIENT, UserType.PARTNER] },
@@ -77,7 +96,7 @@ export default function AdminLayout({
               {webSocketConnected ? 'STOMP CONNECTED' : 'STOMP DISCONNECTED'}
             </span>
           </div>
-          <span className="text-slate-300">기준 시간: 2026-07-01 10:46 (KST)</span>
+          <span className="text-slate-300">기준 시간: {formatDateTime(currentTime)} (KST)</span>
         </div>
       </div>
 
